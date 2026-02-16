@@ -12,8 +12,7 @@ interface HeartItem {
 }
 
 // Main Anniversary Component
-function AnniversaryPage({ audioRef, isPlaying, toggleMusic }: { 
-  audioRef: React.RefObject<HTMLAudioElement>, 
+function AnniversaryPage({ isPlaying, toggleMusic }: { 
   isPlaying: boolean, 
   toggleMusic: () => void 
 }) {
@@ -416,7 +415,7 @@ export default function AnniversaryWebsite() {
   const [showAnniversary, setShowAnniversary] = useState(false);
   const [giftShake, setGiftShake] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = React.useRef<HTMLAudioElement>(null);
+  const audioRef = React.useRef<HTMLAudioElement | null>(null);
 
   React.useEffect(() => {
     const shakeInterval = setInterval(() => {
@@ -456,23 +455,23 @@ export default function AnniversaryWebsite() {
     setShowAnniversary(true);
   };
 
-  if (showAnniversary) {
-    return <AnniversaryPage audioRef={audioRef} isPlaying={isPlaying} toggleMusic={toggleMusic} />;
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-100 via-pink-50 to-white flex items-center justify-center p-4 overflow-hidden relative">
-      
-      {/* Background Music */}
-      <audio 
-        ref={audioRef} 
-        loop 
+    <>
+      {/* Background Music - always mounted so playback persists when switching views */}
+      <audio
+        ref={audioRef}
+        loop
         preload="auto"
       >
         <source src="/music.mp3" type="audio/mpeg" />
         <source src="/music.ogg" type="audio/ogg" />
         Your browser does not support the audio element.
       </audio>
+
+      {showAnniversary ? (
+        <AnniversaryPage isPlaying={isPlaying} toggleMusic={toggleMusic} />
+      ) : (
+        <div className="min-h-screen bg-gradient-to-br from-pink-100 via-pink-50 to-white flex items-center justify-center p-4 overflow-hidden relative">
 
       {/* Floating hearts background */}
       <div className="absolute inset-0">
@@ -720,6 +719,8 @@ export default function AnniversaryWebsite() {
           font-family: 'Brush Script MT', cursive;
         }
       `}</style>
-    </div>
-  );
-}
+        </div>
+        )}
+      </>
+    );
+  }
